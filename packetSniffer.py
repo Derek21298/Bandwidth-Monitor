@@ -3,8 +3,7 @@
 import socket, sys
 from struct import *
 import sys
-from datetime import datetime
-from datetime import timedelta
+import time
 
 #create an INET, STREAMing socket
 try:
@@ -14,7 +13,7 @@ except socket.error or msg:
 	sys.exit()
 
 dataTotal = 0
-startTime = datetime.utcnow()
+startTime = time.time()
 
 while True:
 
@@ -50,11 +49,16 @@ while True:
 
 	dataTotal = dataTotal + sys.getsizeof(data)
 
-	currTime = datetime.utcnow()
-	if(currTime > (startTime + timedelta(seconds=60))): 
+	currTime = time.time()
+	
+#	if(currTime > (startTime + 5)):
+#		print('5 Seconds have passed') 
+
+
+	if(currTime > (startTime + 60)): 
 			
 		print('1 Minute has gone by!!!')
 		print('Data size: ' + str(dataTotal) + ' bytes')
 		dataTotal = 0
-		startTime = datetime.utcnow()
+		startTime = time.time()
 	
