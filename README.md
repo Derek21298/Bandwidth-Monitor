@@ -6,10 +6,11 @@ The bandwidth monitor is meant to inform the user of their computers network usa
 
 ## Requirements
 
-Use the package manager pip to install psutil if not already installed
+Use the package manager pip to install psutil and speedtest-cli if not already installed (For Python 3)
 
 ```bash
-pip install psutil
+pip3 install psutil
+pip3 install speedtest-cli
 ```
 
 ## Contributing
