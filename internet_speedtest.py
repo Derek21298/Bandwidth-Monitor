@@ -9,6 +9,7 @@
 #
 
 import speedtest
+import time
 
 # Function to conduct the speetest
 def test(): 
@@ -27,6 +28,7 @@ def test():
 
 def main():
 
+	start = time.time()
 	# Get the download, upload, and ping from the test
 	download, upload, ping = test()
 
@@ -34,6 +36,11 @@ def main():
 	download = download * 1e-6
 	upload = upload * 1e-6
 	
+	stop = time.time()
+
+	print('Download: {}\nUpload: {}\nPing: {}'.format(download, upload, ping))
+	print('Total Time: {}'.format(stop-start))
+
 	# Write to a csv
 	with open('log.csv', 'w') as file:
 		file.write('Download \t Upload \t Ping\n')
