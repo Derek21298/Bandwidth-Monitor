@@ -33,8 +33,8 @@ for key in net_stats:
 # Get the start bytes sent and received of all interfaces
 for i in range(len(net_stats)):
 
-	sent_start[i] = net_stats[key_list[i]][1]
-	received_start[i] = net_stats[key_list[i]][2]
+	sent_start[i] = net_stats[key_list[i]][0]
+	received_start[i] = net_stats[key_list[i]][1]
 
 # Begin to get data every minute
 print('Starting to Collect Bandwidth Data...')
@@ -66,13 +66,13 @@ while True:
 		
 		for i in range(len(net_stats)):
 	
-			sent_curr[i] = net_stats[key_list[i]][1]
-			received_curr[i] = net_stats[key_list[i]][2]
+			sent_curr[i] = net_stats[key_list[i]][0]
+			received_curr[i] = net_stats[key_list[i]][1]
 			
 			sent[i] = sent_curr[i] - sent_start[i]
 			received[i] = received_curr[i] - received_start[i] 	
 
-			print('Network Interface: {}\nBytes Sent: {}\t\t\tBytes Recieved: {}\n'.format(key_list[i], sent[i], received[i]))
+			print('Network Interface: {}\nBytes Sent: {}\nBytes Recieved: {}\n'.format(key_list[i], sent[i], received[i]))
 
 			total_sent = total_sent + sent[i]
 			total_received = total_received + received[i]
