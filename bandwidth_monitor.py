@@ -9,35 +9,42 @@
 import psutil
 import time
 
-print('Getting preliminary data...')
+print('Gathering Information on Network Interfaces...')
 
 # Get the all the network stats for the first calculation
 net_stats = psutil.net_io_counters(pernic=True)
 
-# Print the net stats (mainly for debugging)
-'''
-print('Network Interface: lo\t\tBytes Sent: %d'%net_stats['lo'][1])
-print('Network Interface: lo\t\tBytes Received: %d\n'%net_stats['lo'][2])
-print('Network Interface: enp4s0\tBytes Sent: %d'%net_stats['enp4s0'][1])
-print('Network Interface: enp4s0\tBytes Received: %d\n'%net_stats['enp4s0'][2])
-print('Network Interface: wlp5s0\tBytes Sent: %d'%net_stats['wlp5s0'][1])
-print('Network Interface: wlp5s0\tBytes Received: %d\n'%net_stats['wlp5s0'][2])
-'''
+# Initialize arrays
+key_list = []
+sent_start = [0, 0, 0]
+received_start = [0, 0, 0]
+sent_curr = [0, 0, 0]
+received_curr = [0, 0, 0]
+sent = [0, 0, 0]
+received = [0, 0, 0]
 
-# Get the bytes sent and received for the different interfaces
-lo_sent_start = net_stats['lo'][1]
-lo_received_start = net_stats['lo'][2]
-enp_sent_start = net_stats['enp4s0'][1]
-enp_received_start = net_stats['enp4s0'][2]
-wlp_sent_start = net_stats['wlp5s0'][1]
-wlp_received_start = net_stats['wlp5s0'][2]
+# Get the network interfaces from the dictionary
+for key in net_stats:
+	
+	print('Network Interface Detected!: {}'.format(key))
+	key_list.append(key)
 
+
+# Get the start bytes sent and received of all interfaces
+for i in range(len(net_stats)):
+
+	sent_start[i] = net_stats[key_list[i]][1]
+	received_start[i] = net_stats[key_list[i]][2]
 
 # Begin to get data every minute
-print('Starting to collect data...')
+print('Starting to Collect Bandwidth Data...')
 
 startTime = time.time()
 periodTime = time.time()
+
+total_sent = 0
+total_received = 0
+
 while True:
 
 	currTime = time.time()
@@ -57,62 +64,70 @@ while True:
 		# Get the current data
 		net_stats = psutil.net_io_counters(pernic=True)
 		
-		lo_sent_curr = net_stats['lo'][1]
-		lo_received_curr = net_stats['lo'][2]
-		enp_sent_curr = net_stats['enp4s0'][1]
-		enp_received_curr = net_stats['enp4s0'][2]
-		wlp_sent_curr = net_stats['wlp5s0'][1]
-		wlp_received_curr = net_stats['wlp5s0'][2]
+		for i in range(len(net_stats)):
+	
+			sent_curr[i] = net_stats[key_list[i]][1]
+			received_curr[i] = net_stats[key_list[i]][2]
+			
+			sent[i] = sent_curr[i] - sent_start[i]
+			received[i] = received_curr[i] - received_start[i] 	
 
-		lo_sent = lo_sent_curr - lo_sent_start
-		enp_sent = enp_sent_curr - enp_sent_start
-		wlp_sent = wlp_sent_curr - wlp_sent_start
+			print('Network Interface: {}\nBytes Sent: {}\t\t\tBytes Recieved: {}\n'.format(key_list[i], sent[i], received[i]))
 
-		# (Current - Start) is the data sent over a minute
-		lo_received = lo_received_curr - lo_received_start
-		enp_received = enp_received_curr - enp_received_start
-		wlp_received = wlp_received_curr - wlp_received_start
+			total_sent = total_sent + sent[i]
+			total_received = total_received + received[i]
 
-		print('Network Interface: lo\t\tBytes Sent: %d'%lo_sent)
-		print('Network Interface: lo\t\tBytes Received: %d\n'%lo_received)
-		print('Network Interface: enp4s0\tBytes Sent: %d'%enp_sent)
-		print('Network Interface: enp4s0\tBytes Received: %d\n'%enp_received)
-		print('Network Interface: wlp5s0\tBytes Sent: %d'%wlp_sent)
-		print('Network Interface: wlp5s0\tBytes Received: %d\n'%wlp_received)
-
-		dataTotal = lo_sent + enp_sent + wlp_sent
-		
+		# SENT DATA
 		# If the data sent is between 1k and 1M print as 1 kB
-		if((dataTotal > 1000) and (dataTotal < 1000000)):
-			dataTotal = dataTotal * 1e-3
-			print('Data sent in the past minute: %.2f KB'%dataTotal)
+		if((total_sent > 1000) and (total_sent < 1000000)):
+			total_sent = total_sent * 1e-3
+			print('Data SENT in the past minute: %.2f KB'%total_sent)
 		
 		# If the data sent is between 1M and 1G print as 1M
-		elif((dataTotal > 1000000) and (dataTotal < 1000000000)):
-			dataTotal = dataTotal * 1e-6
-			print('Data sent in the past minute: %.2f MB'%dataTotal)
+		elif((total_sent > 1000000) and (total_sent < 1000000000)):
+			total_sent = total_sent * 1e-6
+			print('Data SENT in the past minute: %.2f MB'%total_sent)
 
 		# If the data sent is between 1G and 1T print as 1G
-		elif((dataTotal > 1000000000) and (dataTotal < 1000000000000)):
-			dataTotal = dataTotal * 1e-9
-			print('Data sent in the past minute: %.2f GB'%dataTotal)
+		elif((total_sent > 1000000000) and (total_sent < 1000000000000)):
+			total_sent = total_sent * 1e-9
+			print('Data SENT in the past minute: %.2f GB'%total_sent)
 
 		# Else just print as bytes
 		else:
-			print('Data sent in the past minute: %d B'%dataTotal)
+			print('Data SENT in the past minute: %d B'%total_sent)
 
+		# RECEIVED DATA
+		# If the data received is between 1k and 1M print as 1 kB
+		if((total_received > 1000) and (total_received < 1000000)):
+			total_received = total_received * 1e-3
+			print('Data RECEIVED in the past minute: %.2f KB'%total_received)
+		
+		# If the data received is between 1M and 1G print as 1M
+		elif((total_received > 1000000) and (total_received < 1000000000)):
+			total_received = total_received * 1e-6
+			print('Data RECEIVED in the past minute: %.2f MB'%total_received)
+
+		# If the data received is between 1G and 1T print as 1G
+		elif((total_received > 1000000000) and (total_received < 1000000000000)):
+			total_received = total_received * 1e-9
+			print('Data RECEIVED in the past minute: %.2f GB'%total_received)
+
+		# Else just print as bytes
+		else:
+			print('Data RECEIVED in the past minute: %d B'%total_received)
+		
 		# Reset all the variables
-		dataTotal = 0
+		total_sent = 0
+		total_received = 0
 		startTime = time.time()
 		periodTime = time.time()
 		
-		lo_sent_start = lo_sent_curr
-		lo_received_start = lo_received_curr
-		enp_sent_start = enp_sent_curr
-		enp_received_start = enp_received_curr
-		wlp_sent_start = wlp_sent_curr
-		wllp_received_start = wlp_received_curr
-
+		# Set the start values as the old current values
+		for i in range(len(net_stats)):
+	
+			sent_start[i] = sent_curr[i]
+			received_start[i] = received_curr[i]
 
 
 
