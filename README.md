@@ -12,6 +12,18 @@ Use the package manager pip to install psutil if not already installed
 pip install psutil
 ```
 
+To use the internet speedtest, setup the speedtest CLI
+
+```bash
+git clone https://github.com/sivel/speedtest-cli.git
+cd speedtest-cli
+python setup.py install
+```
+
+## Usage
+
+Use python3 to use bandwidth monitor and python 2.7 to use internet speedtest.
+
 ## Contributing
 
-The end goal of this project would be to have a nice web interface to diplay all the results.  Any experience in Angular would be appreciated :)
+The end goal of this project would be to have a nice web interface to diplay all the results.  Any experience web development would be nice :)
